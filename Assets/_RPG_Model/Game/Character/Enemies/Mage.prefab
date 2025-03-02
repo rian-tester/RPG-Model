@@ -10,7 +10,12 @@ PrefabInstance:
     - target: {fileID: 2762307847963126932, guid: 96aaeb0467674ce44b0acba42d09d6fc,
         type: 3}
       propertyPath: chaseDistance
-      value: 20
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 2762307847963126932, guid: 96aaeb0467674ce44b0acba42d09d6fc,
+        type: 3}
+      propertyPath: agroCooldownTime
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3010303717589649397, guid: 96aaeb0467674ce44b0acba42d09d6fc,
         type: 3}

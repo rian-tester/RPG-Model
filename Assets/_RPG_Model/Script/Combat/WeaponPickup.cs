@@ -1,8 +1,6 @@
 using RPG.Attributes;
 using RPG.Control;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace RPG.Combat
@@ -15,7 +13,8 @@ namespace RPG.Combat
 
         private void OnTriggerEnter(Collider other)
         {
-            if(other.tag == "Player")
+            // Check if the player has entered the trigger
+            if (other.tag == "Player")
             {
                 Pickup(other.gameObject);
             }
@@ -23,12 +22,12 @@ namespace RPG.Combat
 
         private void Pickup(GameObject subject)
         {
-
+            // Equip the weapon and restore health if applicable
             if (weapon != null)
             {
                 subject.GetComponent<Fighter>().EquipWeapon(weapon);
             }
-            if (healthToRestore > 0) 
+            if (healthToRestore > 0)
             {
                 subject.GetComponent<Health>().Heal(healthToRestore);
             }
@@ -37,6 +36,7 @@ namespace RPG.Combat
 
         private IEnumerator HideForSeconds(float seconds)
         {
+            // Hide the pickup for a specified duration
             ShowPickup(false);
 
             yield return new WaitForSeconds(seconds);
@@ -46,6 +46,7 @@ namespace RPG.Combat
 
         private void ShowPickup(bool shouldShow)
         {
+            // Show or hide the pickup
             GetComponent<Collider>().enabled = shouldShow;
             transform.GetChild(0).gameObject.SetActive(shouldShow);
             foreach (Transform child in transform)
@@ -54,8 +55,10 @@ namespace RPG.Combat
             }
         }
 
+        // Behaviour specific for items that can be picked up
         public bool HandleRaycast(PlayerController callingController)
         {
+            // Handle the raycast interaction
             if (Input.GetMouseButtonDown(0))
             {
                 Pickup(callingController.gameObject);
@@ -66,6 +69,7 @@ namespace RPG.Combat
 
         public CursorType GetCursorType()
         {
+            // Return the cursor type for pickup
             return CursorType.Pickup;
         }
     }

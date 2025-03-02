@@ -188,7 +188,7 @@ PrefabInstance:
     - target: {fileID: 4762948960507104273, guid: 80f80a5e20b7e0044badfa09e8eb4aef,
         type: 3}
       propertyPath: takeDamage.m_PersistentCalls.m_Calls.Array.data[3].m_MethodName
-      value: Aggrevate
+      value: AggrevateByOthers
       objectReference: {fileID: 0}
     - target: {fileID: 4762948960507104273, guid: 80f80a5e20b7e0044badfa09e8eb4aef,
         type: 3}
@@ -289,13 +289,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ad337b8455858e4f9b09d24e505285c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chaseDistance: 7
+  chaseDistance: 5
   suspicionTime: 3
-  agroCooldownTime: 5
+  agroCooldownTime: 1
   patrolPath: {fileID: 0}
   waypointTolerance: 1
   waypointDwellTime: 3
   patrolSpeedFraction: 0.2
+  shoutDistance: 5
 --- !u!114 &8727974614573191893 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4762948960507104273, guid: 80f80a5e20b7e0044badfa09e8eb4aef,

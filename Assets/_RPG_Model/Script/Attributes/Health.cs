@@ -105,7 +105,7 @@ namespace RPG.Attributes
 
             isDead = true;
             GetComponent<Animator>().SetTrigger("die");
-            GetComponent<ActionScheduler>().CancelcurrentAction();
+            GetComponent<ActionScheduler>().CancelCurrentAction();
 
             
         }

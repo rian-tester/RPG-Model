@@ -1,6 +1,4 @@
 using RPG.Attributes;
-using RPG.Combat;
-using RPG.Core;
 using UnityEngine;
 
 namespace RPG.Combat
@@ -20,6 +18,7 @@ namespace RPG.Combat
 
         public Weapon Spawn(Transform rightHand, Transform leftHand, Animator animator)
         {
+            // Destroy the old weapon and spawn the new one
             DestroyOldWeapon(rightHand, leftHand);
 
             Weapon weapon = null;
@@ -31,7 +30,7 @@ namespace RPG.Combat
                 weapon.gameObject.name = weaponName;
             }
 
-            // Casting the runtimeAnimatorController, to find is it default or override?
+            // Set the animator override controller
             var overrideController = animator.runtimeAnimatorController as AnimatorOverrideController;
 
             if (animatorOverride != null)
@@ -44,11 +43,11 @@ namespace RPG.Combat
             }
 
             return weapon;
-
         }
 
         private void DestroyOldWeapon(Transform rightHand, Transform leftHand)
         {
+            // Find and destroy the old weapon
             Transform oldWeapon = rightHand.Find(weaponName);
             if (oldWeapon == null)
             {
@@ -66,6 +65,7 @@ namespace RPG.Combat
 
         private Transform GetTransform(Transform rightHand, Transform leftHand)
         {
+            // Get the transform of the hand to attach the weapon to
             Transform handTransform;
             if (isRightHand) handTransform = rightHand;
             else handTransform = leftHand;
@@ -74,11 +74,13 @@ namespace RPG.Combat
 
         public bool HasProjectile()
         {
+            // Check if the weapon has a projectile
             return projectile != null;
         }
 
         public void LaunchProjectile(Transform rightHand, Transform leftHand, Health target, GameObject instigator, float calculatedDamage)
         {
+            // Launch the projectile towards the target
             Projectile projectileInstance = Instantiate(projectile, GetTransform(rightHand, leftHand).position, Quaternion.identity);
             if (projectileInstance != null)
             {

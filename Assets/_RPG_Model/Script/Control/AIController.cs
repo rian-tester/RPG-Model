@@ -1,10 +1,11 @@
-﻿using GameDevTV.Utils;
-using RPG.Attributes;
+﻿using System;
 using RPG.Combat;
 using RPG.Core;
 using RPG.Movement;
-using System;
 using UnityEngine;
+using RPG.Attributes;
+using GameDevTV.Utils;
+using UnityEngine.AI;
 
 namespace RPG.Control
 {
@@ -16,7 +17,7 @@ namespace RPG.Control
         [SerializeField] PatrolPath patrolPath;
         [SerializeField] float waypointTolerance = 1f;
         [SerializeField] float waypointDwellTime = 3f;
-        [Range(0,1)]
+        [Range(0, 1)]
         [SerializeField] float patrolSpeedFraction = 0.2f;
         [SerializeField] float shoutDistance = 5f;
 
@@ -25,9 +26,7 @@ namespace RPG.Control
         Mover mover;
         GameObject player;
 
-        //Vector3 guardPosition;
         LazyValue<Vector3> guardPosition;
-
         float timeSinceLastSawPlayer = Mathf.Infinity;
         float timeSinceArrivedAtWaypoint = Mathf.Infinity;
         float timeSinceAggrevated = Mathf.Infinity;
@@ -39,10 +38,21 @@ namespace RPG.Control
             health = GetComponent<Health>();
             mover = GetComponent<Mover>();
             player = GameObject.FindWithTag("Player");
+
             guardPosition = new LazyValue<Vector3>(GetGuardPosition);
+            guardPosition.ForceInit();
         }
 
-        // Lazy Setter
+        public void Reset()
+        {
+            NavMeshAgent navMeshAgent = GetComponent<NavMeshAgent>();
+            navMeshAgent.Warp(guardPosition.value);
+            timeSinceLastSawPlayer = Mathf.Infinity;
+            timeSinceArrivedAtWaypoint = Mathf.Infinity;
+            timeSinceAggrevated = Mathf.Infinity;
+            currentWaypointIndex = 0;
+        }
+
         private Vector3 GetGuardPosition()
         {
             return transform.position;
@@ -50,8 +60,6 @@ namespace RPG.Control
 
         private void Start()
         {
-            //guardPosition = transform.rect;
-            guardPosition.ForceInit();
         }
 
         private void Update()
@@ -74,7 +82,6 @@ namespace RPG.Control
             UpdateTimers();
         }
 
-        // Called by Unity Event takeDamage (Health.cs)
         public void Aggrevate()
         {
             timeSinceAggrevated = 0;
@@ -87,38 +94,11 @@ namespace RPG.Control
             timeSinceAggrevated += Time.deltaTime;
         }
 
-        private void AttackBehaviour()
-        {
-            timeSinceLastSawPlayer = 0;
-            fighter.Attack(player);
-
-            AggrevateNearbyEnemies();
-        }
-
-        private void AggrevateNearbyEnemies()
-        {
-            RaycastHit[] hits = Physics.SphereCastAll(transform.position, shoutDistance, Vector3.up, 0);
-
-            foreach (RaycastHit hit in hits)
-            {
-                AIController ai = hit.collider.GetComponent<AIController>();
-
-                if (ai == null) continue;
-
-                ai.Aggrevate();
-            }
-        }
-
-        private void SuspicionBehaviour()
-        {
-            GetComponent<ActionScheduler>().CancelcurrentAction();
-        }
-
         private void PatrolBehaviour()
         {
             Vector3 nextPosition = guardPosition.value;
 
-            if (patrolPath != null) 
+            if (patrolPath != null)
             {
                 if (AtWaypoint())
                 {
@@ -126,9 +106,8 @@ namespace RPG.Control
                     CycleWaypoint();
                 }
                 nextPosition = GetCurrentWaypoint();
-
             }
-            
+
             if (timeSinceArrivedAtWaypoint > waypointDwellTime)
             {
                 mover.StartMoveAction(nextPosition, patrolSpeedFraction);
@@ -151,23 +130,42 @@ namespace RPG.Control
             return patrolPath.GetWaypoint(currentWaypointIndex);
         }
 
+        private void SuspicionBehaviour()
+        {
+            GetComponent<ActionScheduler>().CancelCurrentAction();
+        }
+
+        private void AttackBehaviour()
+        {
+            timeSinceLastSawPlayer = 0;
+            fighter.Attack(player);
+
+            AggrevateNearbyEnemies();
+        }
+
+        private void AggrevateNearbyEnemies()
+        {
+            RaycastHit[] hits = Physics.SphereCastAll(transform.position, shoutDistance, Vector3.up, 0);
+            foreach (RaycastHit hit in hits)
+            {
+                AIController ai = hit.collider.GetComponent<AIController>();
+                if (ai == null) continue;
+
+                ai.Aggrevate();
+            }
+        }
+
         private bool IsAggrevated()
         {
-
             float distanceToPlayer = Vector3.Distance(player.transform.position, transform.position);
             return distanceToPlayer < chaseDistance || timeSinceAggrevated < agroCooldownTime;
         }
 
-        #region Gizmos
+        // Called by Unity
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.blue;
             Gizmos.DrawWireSphere(transform.position, chaseDistance);
-            
-            UnityEditor.Handles.color = new Color(1, 0, 0, 0.025f);
-            //UnityEditor.Handles.DrawWireDisc(transform.rect, transform.up, chaseDistance);
-            UnityEditor.Handles.DrawSolidDisc(transform.position, transform.up, chaseDistance);
         }
-        #endregion
     }
 }

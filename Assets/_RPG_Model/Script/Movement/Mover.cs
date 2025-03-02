@@ -5,10 +5,7 @@ using RPG.Saving;
 using RPG.Attributes;
 using System;
 using System.IO;
-using System.Text;
-using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
-using Unity.VisualScripting;
 
 namespace RPG.Movement
 {
@@ -30,88 +27,10 @@ namespace RPG.Movement
 
         private void Start()
         {
-            WriteFileTest();
+            // WriteFileTest();
 
-            Debug.Log(Application.persistentDataPath);
+            // Debug.Log(Application.persistentDataPath);
         }
-
-        #region Serialization
-        string testFileName = "testingfile";
-        private void WriteFileTest()
-        {
-            string path = Path.Combine(Application.persistentDataPath, testFileName + ".sav");
-            using (FileStream stream = File.Open(path, FileMode.Create))
-            {
-                //byte[] bytes = Encoding.UTF8.GetBytes("This game is awesome!");
-                //stream.WriteByte(0x47);
-                //stream.WriteByte(0x65);
-                //stream.WriteByte(0x72);
-                //stream.WriteByte(0x69);
-                //stream.WriteByte(0x6e);
-                //stream.WriteByte(0x64);
-                //stream.WriteByte(0x72);
-                //stream.WriteByte(0x61);
-
-                //Vector3 playerTransform = GetPlayerTransform().transform.position;
-                //byte[] buffer = SerializeVector(playerTransform);
-                //stream.Write(buffer, 0, buffer.Length);
-
-                Vector3 playerTransform = GetPlayerTransform().transform.position;
-                BinaryFormatter formatter = new BinaryFormatter();
-                MySeriazableVector position = new MySeriazableVector(playerTransform);
-                formatter.Serialize(stream, position);
-            }
-        }
-
-        private string ReadFileTest()
-        {
-            string path = Path.Combine(Application.persistentDataPath, testFileName + ".sav");
-            using (FileStream stream = File.Open(path, FileMode.Open))
-            {
-                //byte[] buffer = new byte[stream.Length];
-                //stream.Read(buffer, 0, buffer.Length);
-
-                //string message = Encoding.UTF8.GetString(buffer);
-
-                //string message = DeserializeVector(buffer).ToString();
-                //return message;
-
-                BinaryFormatter formatter = new BinaryFormatter();
-
-                string message = "";
-                MySeriazableVector position = (MySeriazableVector) formatter.Deserialize(stream);
-                message = position.ToVector().ToString();
-                return message;
-            }
-        }
-
-        private byte[] SerializeVector(Vector3 vector)
-        {
-            // because float take 4 bytes so its multiply by 3 (x.y.z)
-            byte[] vectorBytes = new byte[3 * 4];
-            BitConverter.GetBytes(vector.x).CopyTo(vectorBytes, 0);
-            BitConverter.GetBytes(vector.y).CopyTo(vectorBytes, 4);
-            BitConverter.GetBytes(vector.z).CopyTo(vectorBytes, 8);
-            return vectorBytes;
-        }
-
-        private Vector3 DeserializeVector(byte[] buffer)
-        {
-            Vector3 result = new Vector3();
-            result.x = BitConverter.ToSingle(buffer, 0);
-            result.y = BitConverter.ToSingle(buffer, 4);
-            result.z = BitConverter.ToSingle(buffer, 8);
-            return result;
-        }
-
-
-        private Transform GetPlayerTransform()
-        {
-            return gameObject.transform;
-        }
-
-
-        #endregion
 
         void Update()
         {
@@ -119,7 +38,7 @@ namespace RPG.Movement
 
             UpdateAnimator();
 
-            Debug.Log(ReadFileTest());
+            // Debug.Log(ReadFileTest());
         }
 
         public void StartMoveAction(Vector3 destination, float speedFraction)
@@ -163,6 +82,7 @@ namespace RPG.Movement
 
         public void Cancel()
         {
+            // Tell navmesh agent to stop 
             navMeshAgent.isStopped = true;
         }
 
@@ -215,6 +135,81 @@ namespace RPG.Movement
 
             GetComponent<NavMeshAgent>().enabled = true;
         }
+
+
+        #region Serialization
+        string testFileName = "testingfile";
+        private void WriteFileTest()
+        {
+            string path = Path.Combine(Application.persistentDataPath, testFileName + ".sav");
+            using (FileStream stream = File.Open(path, FileMode.Create))
+            {
+                //byte[] bytes = Encoding.UTF8.GetBytes("This game is awesome!");
+                //stream.WriteByte(0x47);
+                //stream.WriteByte(0x65);
+                //stream.WriteByte(0x72);
+                //stream.WriteByte(0x69);
+                //stream.WriteByte(0x6e);
+                //stream.WriteByte(0x64);
+                //stream.WriteByte(0x72);
+                //stream.WriteByte(0x61);
+
+                //Vector3 playerTransform = GetPlayerTransform().transform.position;
+                //byte[] buffer = SerializeVector(playerTransform);
+                //stream.Write(buffer, 0, buffer.Length);
+
+                Vector3 playerTransform = GetPlayerTransform().transform.position;
+                BinaryFormatter formatter = new BinaryFormatter();
+                MySeriazableVector position = new MySeriazableVector(playerTransform);
+                formatter.Serialize(stream, position);
+            }
+        }
+
+        private string ReadFileTest()
+        {
+            string path = Path.Combine(Application.persistentDataPath, testFileName + ".sav");
+            using (FileStream stream = File.Open(path, FileMode.Open))
+            {
+                //byte[] buffer = new byte[stream.Length];
+                //stream.Read(buffer, 0, buffer.Length);
+
+                //string message = Encoding.UTF8.GetString(buffer);
+
+                //string message = DeserializeVector(buffer).ToString();
+                //return message;
+
+                BinaryFormatter formatter = new BinaryFormatter();
+
+                string message = "";
+                MySeriazableVector position = (MySeriazableVector)formatter.Deserialize(stream);
+                message = position.ToVector().ToString();
+                return message;
+            }
+        }
+
+        private byte[] SerializeVector(Vector3 vector)
+        {
+            // because float take 4 bytes so its multiply by 3 (x.y.z)
+            byte[] vectorBytes = new byte[3 * 4];
+            BitConverter.GetBytes(vector.x).CopyTo(vectorBytes, 0);
+            BitConverter.GetBytes(vector.y).CopyTo(vectorBytes, 4);
+            BitConverter.GetBytes(vector.z).CopyTo(vectorBytes, 8);
+            return vectorBytes;
+        }
+
+        private Vector3 DeserializeVector(byte[] buffer)
+        {
+            Vector3 result = new Vector3();
+            result.x = BitConverter.ToSingle(buffer, 0);
+            result.y = BitConverter.ToSingle(buffer, 4);
+            result.z = BitConverter.ToSingle(buffer, 8);
+            return result;
+        }
+        private Transform GetPlayerTransform()
+        {
+            return gameObject.transform;
+        }
+        #endregion
     }
 }
 
